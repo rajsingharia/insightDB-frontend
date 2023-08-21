@@ -3,7 +3,8 @@ import {
     Chart as ChartJS,
     ArcElement,
     Tooltip,
-    Legend
+    Legend,
+    ChartData
 } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { getRandomNeonColor } from '../../utils/Helper';
@@ -17,30 +18,29 @@ interface PieChartProps {
 
 export const PieChart: React.FC<PieChartProps> = ({ chartData, chartDataColumns }) => {
 
-    const differentBackgroundColors = getRandomNeonColor(chartDataColumns.length);
-    const differentBordergroundColors = differentBackgroundColors.map((color) => color + '33');
-
+    const differentBorderColors = getRandomNeonColor(chartDataColumns.length);
+    const differentBackgroundColors = differentBorderColors.map((color) => color + '33');
 
     const datasets = [
         {
-            data: chartDataColumns.map((column: any) => {
+            data: chartDataColumns.map((column: string) => {
                 return chartData.map((item: any) => item[column])
             }),
             backgroundColor: chartDataColumns.map(() => {
                 const borderColor = differentBackgroundColors.pop();
-                return borderColor + '33';
+                return borderColor;
             }),
             borderColor: chartDataColumns.map(() => {
-                const borderColor = differentBordergroundColors.pop();
+                const borderColor = differentBorderColors.pop();
                 return borderColor;
             }),
             borderWidth: 1
         }
     ];
 
-    const data = {
+    const data: ChartData<"pie", any[], string> = {
         labels: chartDataColumns,
-        datasets: datasets
+        datasets: datasets as any[]
     }
 
     return <Pie

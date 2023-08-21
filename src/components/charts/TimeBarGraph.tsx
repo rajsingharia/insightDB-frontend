@@ -7,6 +7,7 @@ import {
     Title,
     Tooltip,
     Legend,
+    ChartData
 } from 'chart.js';
 
 import { Bar } from 'react-chartjs-2';
@@ -22,8 +23,14 @@ ChartJS.register(
     Legend
 );
 
+interface TimeBarGraphProps {
+    chartData: unknown[];
+    chartDataColumns: string[];
+    chartDataTimeColumn: string;
+}
 
-export const TimeBarGraph = ({ chartData, chartDataColumns, chartDataTimeColumn }: any) => {
+
+export const TimeBarGraph: React.FC<TimeBarGraphProps>= ({ chartData, chartDataColumns, chartDataTimeColumn }) => {
 
     const options = {
         responsive: true,
@@ -40,12 +47,12 @@ export const TimeBarGraph = ({ chartData, chartDataColumns, chartDataTimeColumn 
 
     const labels = chartData.map((item: any) => moment(item[chartDataTimeColumn]).format('MMM YYYY'));
 
-    chartDataColumns = chartDataColumns.filter((column: any) => column !== chartDataTimeColumn);
+    chartDataColumns = chartDataColumns.filter((column: string) => column !== chartDataTimeColumn);
 
     const differentBorderColors = getRandomNeonColor(chartDataColumns.length);
     const differentBgColors = differentBorderColors.map((color) => color + '33');
 
-    const datasets = chartDataColumns.map((column: any) => {
+    const datasets = chartDataColumns.map((column: string) => {
         if (column !== chartDataTimeColumn) {
             return {
                 fill: true,
@@ -58,15 +65,15 @@ export const TimeBarGraph = ({ chartData, chartDataColumns, chartDataTimeColumn 
         }
     });
 
-    const data = {
+    const data: ChartData<"bar", any[], string> = {
         labels,
-        datasets: datasets
+        datasets: datasets as any[]
     };
-
 
     return (
         <Bar
+            data={data}
             options={options}
-            data={data} />
+        />
     );
 }

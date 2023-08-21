@@ -9,6 +9,7 @@ import {
     Tooltip,
     Filler,
     Legend,
+    ChartData
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -27,7 +28,15 @@ import moment from 'moment';
 import { getRandomNeonColor } from '../../utils/Helper';
 
 
-export const LineChart = ({ chartData, chartDataColumns, chartDataTimeColumn, fill }: any) => {
+interface LineChartProps {
+    chartData: unknown[];
+    chartDataColumns: string[];
+    chartDataTimeColumn: string;
+    fill: boolean;
+}
+
+
+export const LineChart: React.FC<LineChartProps> = ({ chartData, chartDataColumns, chartDataTimeColumn, fill }) => {
 
 
     const options = {
@@ -63,9 +72,9 @@ export const LineChart = ({ chartData, chartDataColumns, chartDataTimeColumn, fi
         }
     });
 
-    const data = {
+    const data: ChartData<"line", any[], string> = {
         labels,
-        datasets: datasets
+        datasets: datasets as any[]
     };
 
     return (

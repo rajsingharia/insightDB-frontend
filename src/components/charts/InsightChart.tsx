@@ -1,22 +1,27 @@
+import { ICharts } from "../../interfaces/ICharts";
+import { FetchDataResponse } from "../../pages/addInsight/AddInsight";
 import { LineChart } from "./LineChart";
 import { PieChart } from "./PieChart";
 import { ScatterChart } from "./ScatterChart";
 import { TimeBarGraph } from "./TimeBarGraph";
 
 type InsightChartProps = {
-    chartData: unknown[];
-    chartType: { id: number, icon: string, name: string, value: string };
+    insightData: FetchDataResponse;
+    chartType: ICharts;
 }
 
-export const InsightChart: React.FC<InsightChartProps> = ({ chartData, chartType }) => {
+export const InsightChart: React.FC<InsightChartProps> = ({ insightData, chartType }) => {
 
     // process the data according to the chartType -> extract columns -> clean and format data
     // create the chart
+    
+    const chartData = insightData.data;
 
     if (chartType.value === 'timeBar') {
-        //TODO: find a way to make this dynamic (not hard coded)
-        const chartDataTimeColumn = 'month';
-        const chartDataColumns = Object.keys(chartData[0] as object).filter((key) => key !== chartDataTimeColumn);
+        
+        let chartDataColumns: string[] = insightData.fields;
+        const chartDataTimeColumn = chartDataColumns[0]; //TODO: find a way to make this dynamic
+        chartDataColumns = chartDataColumns.filter((key) => key !== chartDataTimeColumn);
 
         return (
             <TimeBarGraph
@@ -27,7 +32,7 @@ export const InsightChart: React.FC<InsightChartProps> = ({ chartData, chartType
         )
     } else if (chartType.value === 'pie') {
 
-        const chartDataColumns = Object.keys(chartData[0] as object);
+        const chartDataColumns = insightData.fields;
 
         return (
             <PieChart
@@ -36,8 +41,9 @@ export const InsightChart: React.FC<InsightChartProps> = ({ chartData, chartType
             />
         )
     } else if (chartType.value === 'area' || chartType.value === 'line') {
-        const chartDataTimeColumn = 'month';
-        const chartDataColumns = Object.keys(chartData[0] as object).filter((key) => key !== chartDataTimeColumn);
+        let chartDataColumns: string[] = insightData.fields;
+        const chartDataTimeColumn = chartDataColumns[0]; //TODO: find a way to make this dynamic
+        chartDataColumns = chartDataColumns.filter((key) => key !== chartDataTimeColumn);
 
         const fill = chartType.value === 'area' ? true : false;
 
@@ -49,7 +55,7 @@ export const InsightChart: React.FC<InsightChartProps> = ({ chartData, chartType
                 fill={fill} />
         )
     } else if (chartType.value === 'scatter') {
-        const chartDataColumns = Object.keys(chartData[0] as object);
+        const chartDataColumns = insightData.fields;
 
         return (
             <ScatterChart
@@ -61,7 +67,6 @@ export const InsightChart: React.FC<InsightChartProps> = ({ chartData, chartType
 
     return (
         <div>
-
         </div>
     )
 }

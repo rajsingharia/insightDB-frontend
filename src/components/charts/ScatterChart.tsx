@@ -6,6 +6,7 @@ import {
     LineElement,
     Tooltip,
     Legend,
+    ChartData
 } from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 
@@ -17,20 +18,12 @@ ChartJS.register(LinearScale,
 
 import { getRandomNeonColor } from '../../utils/Helper';
 
-// const data = {
-//     datasets: [
-//         {
-//             label: 'A dataset',
-//             data: Array.from({ length: 100 }, () => ({
-//                 x: faker.datatype.number({ min: -100, max: 100 }),
-//                 y: faker.datatype.number({ min: -100, max: 100 }),
-//             })),
-//             backgroundColor: 'rgba(255, 99, 132, 1)',
-//         },
-//     ],
-// };
+interface ScatterChartProps {
+    chartData: unknown[];
+    chartDataColumns: string[];
+}
 
-export const ScatterChart = ({ chartData, chartDataColumns }: any) => {
+export const ScatterChart: React.FC<ScatterChartProps> = ({ chartData, chartDataColumns }) => {
 
     const options = {
         scales: {
@@ -41,7 +34,6 @@ export const ScatterChart = ({ chartData, chartDataColumns }: any) => {
     };
 
     const labels = chartDataColumns;
-    console.log("Scatter Chart Labels: ", labels)
     const datasets = chartData.map((item: any) => {
         return {
             label: `(${labels[0]},${labels[1]})`,
@@ -53,11 +45,9 @@ export const ScatterChart = ({ chartData, chartDataColumns }: any) => {
         }
     });
 
-    console.log("Scatter Chart Data: ", datasets);
-
-    const data = {
+    const data: ChartData<"scatter", any[], string> = {
         labels,
-        datasets: datasets
+        datasets: datasets as any[]
     }
 
     return (

@@ -3,6 +3,7 @@ import { CustomButton } from '../customMuiComponents/CustomButton'
 import AuthAxios from '../../utils/AuthAxios';
 import { CustomTextField } from '../customMuiComponents/CustomTextField';
 import { ICharts } from '../../interfaces/ICharts';
+import { FetchDataResponse } from '../../pages/addInsight/AddInsight';
 
 
 
@@ -22,24 +23,22 @@ type QueryInfoResponse = {
 
 interface QueryFieldsProps {
     integrationId: string;
-    setInsightData: React.Dispatch<React.SetStateAction<unknown[]>>;
+    setInsightData: React.Dispatch<React.SetStateAction<FetchDataResponse | undefined>>;
     chartType: ICharts;
     setInsightParameters: React.Dispatch<React.SetStateAction<JSON>>;
 }
 
 export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsightData, chartType, setInsightParameters }) => {
 
-    const authAxios = AuthAxios.getAuthAxios();
-
     const [queryInfo, setQueryInfo] = React.useState<QueryInfoResponse>({} as QueryInfoResponse);
 
     useEffect(() => {
-
+        const authAxios = AuthAxios.getAuthAxios();
         authAxios.get(`/charts/queries/${chartType.id}`)
             .then((res) => {
                 console.log("Query Info: ", res.data);
                 setQueryInfo(res.data);
-                setInsightData([]);
+                setInsightData(undefined);
                 setInsightParameters({} as JSON);
             })
             .catch((err) => {
@@ -50,6 +49,8 @@ export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsi
 
     const getInsightData = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        const authAxios = AuthAxios.getAuthAxios();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const parameters: any = {};
@@ -79,7 +80,7 @@ export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsi
 
         authAxios.post('/fetchData', body)
             .then((res) => {
-                console.log("Data: ", res.data);
+                console.log("Data: ", res.data.data);
                 setInsightData(res.data);
                 setInsightParameters(parameters);
             })

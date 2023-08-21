@@ -2,15 +2,19 @@
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "../../context/AuthContext"
 import AuthAxios from "../../utils/AuthAxios";
+import IUserInsights from "../../interfaces/IUserInsights";
+import { CircularProgress, Grid } from "@mui/material";
+import { UserInsightCard } from "../../components/userInsightCard/UserInsightCard";
+
 
 export const Home = () => {
 
   const { user } = useContext(AuthContext);
-  const authAxios = AuthAxios.getAuthAxios();
-  const [userInsights, setUserInsights] = useState<unknown[]>([]);
+  const [userInsights, setUserInsights] = useState<IUserInsights[] | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-
+    const authAxios = AuthAxios.getAuthAxios();
     authAxios.get('/insights')
       .then((res) => {
         console.log("Insights: ", res.data);
@@ -18,29 +22,50 @@ export const Home = () => {
       })
       .catch((err) => {
         console.log(err)
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       });
   }, [])
 
   return (
     <div className="h-full w-full">
       {
-        userInsights && userInsights.length === 0 &&
+        loading &&
+        <div className="flex flex-col justify-center items-center w-full h-full">
+          <h1 className="text-2xl font-bold">🔍 Gathering Insights for {user.firstName}...</h1>
+          <CircularProgress
+            size={40}
+            className="mt-5"
+            thickness={5} />
+        </div>
+      }
+      {
+        !loading && userInsights && userInsights.length === 0 &&
         <div className="flex flex-col justify-center items-center w-full h-full">
           <h1 className="text-2xl font-bold">No Insights for {user.firstName}</h1>
         </div>
       }
       {
-        userInsights && userInsights.length > 0 &&
-        userInsights.map((insight: any) => {
-          return (
-            <div key={insight.id}
-              className="flex flex-col justify-start items-start w-full bg-purple-500 p-3 rounded-lg bg-opacity-30 border-2 border-purple-500">
-              <h1 className="text-2xl font-bold font-mono">{insight.title}</h1>
-              <h1 className="text-lg font-normal font-mono">{insight.description}</h1>
-            </div>
-          )
-        })
+        !loading && userInsights && userInsights.length > 0 &&
+        <Grid container spacing={2}>
+          {
+            userInsights.map((insight) => {
+              return (
+                <Grid item xs={10} lg={4} key={insight.id}>
+                  <UserInsightCard
+                    insight={insight}
+                  />
+                </Grid>
+              )
+            })
+          }
+        </Grid>
       }
     </div>
   )
 }
+
+
