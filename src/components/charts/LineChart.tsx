@@ -25,7 +25,8 @@ ChartJS.register(
 );
 
 import moment from 'moment';
-import { getRandomNeonColor } from '../../utils/Helper';
+// import { getRandomNeonColor } from '../../utils/Helper';
+import { ChartColors } from '../../pages/addInsight/AddInsight';
 
 
 interface LineChartProps {
@@ -33,10 +34,11 @@ interface LineChartProps {
     chartDataColumns: string[];
     chartDataTimeColumn: string;
     fill: boolean;
+    chartColors: ChartColors;
 }
 
 
-export const LineChart: React.FC<LineChartProps> = ({ chartData, chartDataColumns, chartDataTimeColumn, fill }) => {
+export const LineChart: React.FC<LineChartProps> = ({ chartData, chartDataColumns, chartDataTimeColumn, fill, chartColors }) => {
 
 
     const options = {
@@ -56,18 +58,17 @@ export const LineChart: React.FC<LineChartProps> = ({ chartData, chartDataColumn
 
     chartDataColumns = chartDataColumns.filter((column: any) => column !== chartDataTimeColumn);
 
-    const differentBackgroundColors = getRandomNeonColor(chartDataColumns.length);
-
     const datasets = chartDataColumns.map((column: any) => {
         if (column !== chartDataTimeColumn) {
-            const borderColor = differentBackgroundColors.pop();
-            const bgColor = borderColor + '33';
+            const borderColor = chartColors.borderColor.pop();
+            const bgColor = chartColors.backgroundColor.pop();
             return {
                 fill: fill,
                 label: column,
                 data: chartData.map((item: any) => item[column]),
                 backgroundColor: bgColor,
                 borderColor: borderColor,
+                borderWidth: 2
             };
         }
     });

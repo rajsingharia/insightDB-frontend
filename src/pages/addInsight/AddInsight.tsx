@@ -6,9 +6,8 @@ import { InsightChart } from "../../components/charts/InsightChart";
 import { QueryFields } from "../../components/query/QueryFields";
 import { ICharts } from "../../interfaces/ICharts";
 import { ChartSettings } from "../../components/chartSettings/ChartSettings";
-import { Save } from "lucide-react";
 
-type userIntegrationResponse = {
+export type userIntegrationResponse = {
   id: string;
   name: string;
   type: string;
@@ -27,19 +26,24 @@ type saveInsightRequest = {
 }
 
 export type FetchDataResponse = {
-  countOfFields: number;
   fields: string[];
-  countOfData: number;
+  timeField?: string;
   data: unknown[];
+}
+
+export type ChartColors = {
+  backgroundColor: string[];
+  borderColor: string[];
 }
 
 
 export const AddInsight = () => {
 
   const [userIntegrations, setUserIntegrations] = useState<userIntegrationResponse[]>([]);
-  const [selectedIntegration, setSelectedIntegration] = useState<userIntegrationResponse | null>(null);
+  const [selectedIntegration, setSelectedIntegration] = useState<userIntegrationResponse | undefined>(undefined);
   const [insightData, setInsightData] = useState<FetchDataResponse | undefined>(undefined);
   const [selectedChart, setSelectedChart] = useState<ICharts>({} as ICharts);
+  const [selectedChartColors, setSelectedChartColors] = useState<ChartColors | undefined>(undefined);
   const [supportedChartsList, setSupportedChartsList] = useState<ICharts[]>([]);
   const [insightTitle, setInsightTitle] = useState<string>('');
   const [insightDescription, setInsightDescription] = useState<string>('');
@@ -93,11 +97,13 @@ export const AddInsight = () => {
       return;
     }
 
-    //insightGraphData -> should contain chartType and chartData(color, labels, datasets)
+    //insightGraphData -> should contain chartType and chartData(color, labels)
 
     const graphData = {
       chartType: selectedChart.value,
-      chartData: insightData
+      chartData: {
+        color: selectedChartColors
+      }
     }
 
     const insightGraphData = JSON.stringify(graphData);
@@ -114,10 +120,12 @@ export const AddInsight = () => {
       insight: saveInsightRequest
     }
 
+    console.log("Save Insight Request: ", body);
+
     authAxios.post('/insights', body)
       .then((res) => {
         console.log(`Insight Saved: `, res.data)
-        alert("Insight Saved");
+        setSnackBar({ open: true, message: "Insight Saved Successfully ✅🔒" });
       })
       .catch((err) => {
         console.log(err)
@@ -130,27 +138,26 @@ export const AddInsight = () => {
       <div className="flex flex-col justify-start items-center h-full w-3/4 gap-5">
         <div className="flex justify-center items-center bg-black h-1/2 w-full p-5 rounded-lg">
           {
-            insightData && insightData.data.length > 0 &&
+            // TODO: Explore lazy loading of chart component
+            insightData && insightData.data.length > 0 && selectedChartColors &&
             <InsightChart
-            insightData={insightData}
+              insightData={insightData}
               chartType={selectedChart}
+              chartColors={selectedChartColors}
             />
           }
         </div>
         <div className="flex flex-col justify-start items-end bg-black h-1/2 w-full p-5 rounded-lg gap-4">
-          {
-            <div className="border-2 border-purple-500 rounded px-4 py-1 bg-purple-500 cursor-pointer bg-opacity-30"
-              onClick={saveInsight}>
-              <Save color="white" />
-            </div>
-          }
+          
           {
             selectedIntegration &&
             <QueryFields
               integrationId={selectedIntegration.id}
               setInsightData={setInsightData}
+              setSelectedChartColors={setSelectedChartColors}
               chartType={selectedChart}
               setInsightParameters={setInsightParameters}
+              saveInsight={saveInsight}
             />
           }
         </div>

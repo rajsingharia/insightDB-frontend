@@ -1,69 +1,83 @@
-import { useContext, useState } from "react"
-import { AuthContext } from "../../context/AuthContext"
-import AuthAxios from "../../utils/AuthAxios";
-import { useNavigate } from "react-router-dom";
+import { useState, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../context/AuthContext'
+import { CustomTextField } from '../../components/customMuiComponents/CustomTextField'
+import LoginRegisterButton from '../../components/customMuiComponents/CustomLoginRegistrationButton'
+import AuthAxios from '../../utils/AuthAxios'
+import { LoginOrRegisterEnum } from '../../utils/Constants'
 
-export const Login = () => {
 
-  const authAxios = AuthAxios.getAuthAxios();
-  const { login, setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+type LoginProps = {
+  setLoginOrRegister: React.Dispatch<React.SetStateAction<LoginOrRegisterEnum>>
+}
+
+export const Login: React.FC<LoginProps> = ({ setLoginOrRegister }) => {
+
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const navigate = useNavigate();
+  const { login, setUser } = useContext(AuthContext);
+  const authAxios = AuthAxios.getAuthAxios();
 
-
-  const loginUser = async (event: React.FormEvent<HTMLDivElement>) => {
-    console.log("submittted");
-    event.preventDefault();
+  const loginUser = () => {
 
     const body = {
       email: email,
       password: password
     }
-    try {
-      const response = await authAxios.post('/auth/login', body);
-      console.log(response);
-      login(response.data.token);
-      setUser(response.data.user);
-      navigate('/');
-    } catch (error) {
-      console.log(error);
-    }
+    authAxios.post('/auth/login', body)
+      .then((response) => {
+        console.log(response);
+        login(response.data.token);
+        setUser(response.data.user);
+        navigate('/');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
 
   return (
-    <div className="flex justify-center items-center h-full w-full">
-      <div className="flex justify-center items-center h-1/2 bg-white rounded shadow-sm text-black gap-2 p-3">
-        <div className="form" onSubmit={loginUser}>
-          <form>
-            <div className="mb-2">
-              <label>Emai </label>
-              <input
-                type="text"
-                name="uname"
-                required
-                className="border-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className="mb-4">
-              <label>Password </label>
-              <input
-                type="password"
-                name="pass"
-                required
-                className="border-2"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <div className="flex justify-center">
-              <button className="bg-green-500 rounded text-center hover:bg-green-400 cursor-pointer p-1 text-white"
-                type="submit">
-                Submit
-              </button>
-            </div>
-          </form>
+    <div className='login-register-card-container'>
+      <div className='login-register-card'>
+        <div className='login-register-card-header'> Login </div>
+        <div className='login-register-card-body'>
+          <CustomTextField
+            id="email"
+            label="Email"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            size='small'
+            color='secondary'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <CustomTextField
+            id="password"
+            label="Password"
+            variant="outlined"
+            fullWidth
+            type='password'
+            margin="normal"
+            size='small'
+            color='secondary'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <LoginRegisterButton
+            variant="contained"
+            fullWidth
+            onClick={loginUser}>
+            Login
+          </LoginRegisterButton>
+        </div>
+      </div>
+      <div>
+        <div className='register-half-circle' onClick={() => setLoginOrRegister(LoginOrRegisterEnum.register)}>
+          <div className='register-half-circle-text'> Register </div>
         </div>
       </div>
     </div>

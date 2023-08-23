@@ -1,7 +1,7 @@
 
 import { Routes, Route } from "react-router-dom";
 import { Home } from "./pages/home/Home";
-import { Login } from "./pages/auth/Login";
+// import { Login } from "./pages/auth/Login";
 import PrivateRoute from "./utils/PrivateRoute";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
@@ -11,6 +11,7 @@ import { SideBar } from "./components/sidebar/SideBar";
 import { Settings } from "./pages/settings/Settings";
 import { AddInsight } from "./pages/addInsight/AddInsight";
 import { CircularProgress } from "@mui/material";
+import LoginRegister from "./pages/auth/LoginRegister";
 
 
 function App() {
@@ -36,7 +37,7 @@ function App() {
                   <Route path='/account' element={<MyAccount />} />
                   <Route path='/settings' element={<Settings />} />
                 </Route>
-                <Route path='/login' element={<Login />} />
+                <Route path='/login-register' element={<LoginRegister />} />
                 <Route path='*' element={<NotFount />} />
               </Routes>
             </div>

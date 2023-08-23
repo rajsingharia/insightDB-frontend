@@ -18,15 +18,19 @@ export const Home = () => {
     authAxios.get('/insights')
       .then((res) => {
         console.log("Insights: ", res.data);
-        setUserInsights(res.data);
+        const insights = res.data;
+        //for testing adding same insight 2 times
+        // insights.push(insights[0]);
+        // insights.push(insights[1]);
+        setUserInsights(insights);
       })
       .catch((err) => {
         console.log(err)
       })
       .finally(() => {
-        setTimeout(() => {
+        //setTimeout(() => {
           setLoading(false);
-        }, 1000);
+        //}, 1000);
       });
   }, [])
 
@@ -48,13 +52,29 @@ export const Home = () => {
           <h1 className="text-2xl font-bold">No Insights for {user.firstName}</h1>
         </div>
       }
+      {/* 
+
+      Grid Layout
+      -------
+      |g1|g2|
+      -------
+      |g3|g4|
+      -------
+
+      g1, g2, g3, g4 -> 4 eqaual divs
+      11,12 -> Grid 1 (could contain 1 or 2 cards within)
+      21,22 -> Grid 2 (could contain 1 or 2 cards within)
+      31,32 -> Grid 3 (could contain 1 or 2 cards within)
+      41,42 -> Grid 4 (could contain 1 or 2 cards within)
+      
+      */}
       {
         !loading && userInsights && userInsights.length > 0 &&
         <Grid container spacing={2}>
           {
             userInsights.map((insight) => {
               return (
-                <Grid item xs={10} lg={4} key={insight.id}>
+                <Grid item md={3} key={insight.id}>
                   <UserInsightCard
                     insight={insight}
                   />

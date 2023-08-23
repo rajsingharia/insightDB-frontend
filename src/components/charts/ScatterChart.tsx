@@ -16,14 +16,16 @@ ChartJS.register(LinearScale,
     Tooltip,
     Legend);
 
-import { getRandomNeonColor } from '../../utils/Helper';
+// import { getRandomNeonColor } from '../../utils/Helper';
+import { ChartColors } from '../../pages/addInsight/AddInsight';
 
 interface ScatterChartProps {
     chartData: unknown[];
     chartDataColumns: string[];
+    chartColors: ChartColors;
 }
 
-export const ScatterChart: React.FC<ScatterChartProps> = ({ chartData, chartDataColumns }) => {
+export const ScatterChart: React.FC<ScatterChartProps> = ({ chartData, chartDataColumns, chartColors}) => {
 
     const options = {
         scales: {
@@ -41,7 +43,9 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({ chartData, chartData
                 x: item[chartDataColumns[0]],
                 y: item[chartDataColumns[1]]
             }],
-            backgroundColor: getRandomNeonColor(1),
+            backgroundColor: chartColors.backgroundColor.pop(),
+            borderColor: chartColors.borderColor.pop(),
+            borderWidth: 2
         }
     });
 

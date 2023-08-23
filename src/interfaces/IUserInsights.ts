@@ -2,13 +2,16 @@ export default interface IUserInsights {
     id: string;
     title: string;
     description?: string;
-    integrationId: string;
+    inetgrationId: string;
     creatorId: string;
     createdAt: string;
     updatedAt: string;
     graphData: {
         chartType: string;
-        // colors: string[];
+        chartColors: {
+            backgroundColor: string[];
+            borderColor: string[];
+        };
         // labels: string[];
         // datasets: {
         //     label: string;

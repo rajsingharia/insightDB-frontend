@@ -12,7 +12,8 @@ import {
 
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
-import { getRandomNeonColor } from '../../utils/Helper';
+// import { getRandomNeonColor } from '../../utils/Helper';
+import { ChartColors } from '../../pages/addInsight/AddInsight';
 
 ChartJS.register(
     CategoryScale,
@@ -27,10 +28,11 @@ interface TimeBarGraphProps {
     chartData: unknown[];
     chartDataColumns: string[];
     chartDataTimeColumn: string;
+    chartColors: ChartColors;
 }
 
 
-export const TimeBarGraph: React.FC<TimeBarGraphProps>= ({ chartData, chartDataColumns, chartDataTimeColumn }) => {
+export const TimeBarGraph: React.FC<TimeBarGraphProps>= ({ chartData, chartDataColumns, chartDataTimeColumn, chartColors }) => {
 
     const options = {
         responsive: true,
@@ -49,18 +51,15 @@ export const TimeBarGraph: React.FC<TimeBarGraphProps>= ({ chartData, chartDataC
 
     chartDataColumns = chartDataColumns.filter((column: string) => column !== chartDataTimeColumn);
 
-    const differentBorderColors = getRandomNeonColor(chartDataColumns.length);
-    const differentBgColors = differentBorderColors.map((color) => color + '33');
-
     const datasets = chartDataColumns.map((column: string) => {
         if (column !== chartDataTimeColumn) {
             return {
                 fill: true,
                 label: column,
                 data: chartData.map((item: any) => item[column]),
-                backgroundColor: differentBgColors.pop(),
-                borderColor: differentBorderColors.pop(),
-                borderWidth: 1
+                backgroundColor: chartColors.backgroundColor.pop(),
+                borderColor: chartColors.borderColor.pop(),
+                borderWidth: 2
             };
         }
     });
