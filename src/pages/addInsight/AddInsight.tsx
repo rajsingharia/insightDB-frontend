@@ -6,6 +6,9 @@ import { InsightChart } from "../../components/charts/InsightChart";
 import { QueryFields } from "../../components/query/QueryFields";
 import { ICharts } from "../../interfaces/ICharts";
 import { ChartSettings } from "../../components/chartSettings/ChartSettings";
+import { useNavigate } from "react-router-dom";
+import { ChartColors } from "../../types/ChartColors";
+import { GraphData } from "../../types/GraphData";
 
 export type userIntegrationResponse = {
   id: string;
@@ -23,32 +26,37 @@ type saveInsightRequest = {
   integrationId: string;
   graphData: JSON;
   parameters: JSON;
+  refreshRate?: number;
 }
 
 export type FetchDataResponse = {
+  countOfFields: number;
   fields: string[];
   timeField?: string;
   data: unknown[];
 }
 
-export type ChartColors = {
-  backgroundColor: string[];
-  borderColor: string[];
-}
-
 
 export const AddInsight = () => {
+
+  const navigate = useNavigate();
 
   const [userIntegrations, setUserIntegrations] = useState<userIntegrationResponse[]>([]);
   const [selectedIntegration, setSelectedIntegration] = useState<userIntegrationResponse | undefined>(undefined);
   const [insightData, setInsightData] = useState<FetchDataResponse | undefined>(undefined);
   const [selectedChart, setSelectedChart] = useState<ICharts>({} as ICharts);
   const [selectedChartColors, setSelectedChartColors] = useState<ChartColors | undefined>(undefined);
+  const [refreshRate, setRefreshRate] = useState<number>(0);
   const [supportedChartsList, setSupportedChartsList] = useState<ICharts[]>([]);
   const [insightTitle, setInsightTitle] = useState<string>('');
   const [insightDescription, setInsightDescription] = useState<string>('');
   const [insightParameters, setInsightParameters] = useState<JSON>({} as JSON);
   const [snackBar, setSnackBar] = useState<{ open: boolean, message: string }>({ open: false, message: '' });
+
+
+  const changeRefreshRate = (refreshRate: number) => {
+    setRefreshRate(refreshRate);
+  }
 
 
   useEffect(() => {
@@ -59,7 +67,8 @@ export const AddInsight = () => {
         setUserIntegrations(res.data)
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
+        setSnackBar({ open: true, message: "Error Fetching Integrations" });
       });
 
     authAxios.get('/charts/supported-charts')
@@ -69,12 +78,13 @@ export const AddInsight = () => {
         setSelectedChart(res.data.defaultChart);
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
+        setSnackBar({ open: true, message: "Error Fetching Supported Charts" });
       });
 
   }, []);
 
-  const handelSelectedIntegrationChange = (event: SelectChangeEvent) => {
+  const handelSelectedIntegrationChange = (event: SelectChangeEvent<unknown>) => {
     const selectedIntegrationId = event.target.value as string;
     const selectedIntegration = userIntegrations.find((integration) => integration.id === selectedIntegrationId);
     if (selectedIntegration) setSelectedIntegration(selectedIntegration);
@@ -96,14 +106,16 @@ export const AddInsight = () => {
       setSnackBar({ open: true, message: "No Parameters" });
       return;
     }
+    else if (!selectedChartColors) {
+      setSnackBar({ open: true, message: "No Chart Colors" });
+      return;
+    }
 
     //insightGraphData -> should contain chartType and chartData(color, labels)
 
-    const graphData = {
+    const graphData: GraphData = {
       chartType: selectedChart.value,
-      chartData: {
-        color: selectedChartColors
-      }
+      chartColors: selectedChartColors
     }
 
     const insightGraphData = JSON.stringify(graphData);
@@ -113,19 +125,19 @@ export const AddInsight = () => {
       description: insightDescription,
       integrationId: selectedIntegration?.id || '',
       graphData: JSON.parse(insightGraphData),
-      parameters: insightParameters
+      parameters: insightParameters,
+      refreshRate: refreshRate
     }
 
     const body = {
       insight: saveInsightRequest
     }
 
-    console.log("Save Insight Request: ", body);
-
     authAxios.post('/insights', body)
       .then((res) => {
         console.log(`Insight Saved: `, res.data)
         setSnackBar({ open: true, message: "Insight Saved Successfully ✅🔒" });
+        navigate('/',{ replace: true });
       })
       .catch((err) => {
         console.log(err)
@@ -147,8 +159,7 @@ export const AddInsight = () => {
             />
           }
         </div>
-        <div className="flex flex-col justify-start items-end bg-black h-1/2 w-full p-5 rounded-lg gap-4">
-          
+        <div className="flex flex-col justify-start items-end bg-black h-1/2 w-full p-5 rounded-lg gap-4">          
           {
             selectedIntegration &&
             <QueryFields
@@ -158,6 +169,7 @@ export const AddInsight = () => {
               chartType={selectedChart}
               setInsightParameters={setInsightParameters}
               saveInsight={saveInsight}
+              changeRefreshRate={changeRefreshRate}
             />
           }
         </div>
@@ -196,20 +208,3 @@ export const AddInsight = () => {
     </div>
   )
 }
-
-
-/*
-model Insight {
-  id            String       @id @default(uuid())
-  title         String
-  description   String?
-  integration   Integration? @relation(fields: [inetgrationId], references: [id])
-  inetgrationId String
-  creator       User?        @relation(fields: [creatorId], references: [id])
-  creatorId     String
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  graphData     Json
-  parameters    Json
-}
-*/

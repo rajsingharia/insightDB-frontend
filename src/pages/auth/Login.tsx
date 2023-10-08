@@ -8,10 +8,11 @@ import { LoginOrRegisterEnum } from '../../utils/Constants'
 
 
 type LoginProps = {
-  setLoginOrRegister: React.Dispatch<React.SetStateAction<LoginOrRegisterEnum>>
+  setLoginOrRegister: React.Dispatch<React.SetStateAction<LoginOrRegisterEnum>>;
+  setSnackBar: React.Dispatch<React.SetStateAction<{ open: boolean; message: string; }>>;
 }
 
-export const Login: React.FC<LoginProps> = ({ setLoginOrRegister }) => {
+export const Login: React.FC<LoginProps> = ({ setLoginOrRegister, setSnackBar }) => {
 
 
   const [email, setEmail] = useState('')
@@ -31,10 +32,11 @@ export const Login: React.FC<LoginProps> = ({ setLoginOrRegister }) => {
         console.log(response);
         login(response.data.token);
         setUser(response.data.user);
-        navigate('/');
+        navigate('/',{ replace: true });
       })
       .catch((error) => {
         console.log(error);
+        setSnackBar({ open: true, message: error.message });
       });
   }
 

@@ -25,8 +25,7 @@ ChartJS.register(
 );
 
 import moment from 'moment';
-// import { getRandomNeonColor } from '../../utils/Helper';
-import { ChartColors } from '../../pages/addInsight/AddInsight';
+import { ChartColors } from '../../types/ChartColors';
 
 
 interface LineChartProps {
@@ -58,16 +57,16 @@ export const LineChart: React.FC<LineChartProps> = ({ chartData, chartDataColumn
 
     chartDataColumns = chartDataColumns.filter((column: any) => column !== chartDataTimeColumn);
 
+    let bgIdx = 0, boIdx = 0;
+
     const datasets = chartDataColumns.map((column: any) => {
         if (column !== chartDataTimeColumn) {
-            const borderColor = chartColors.borderColor.pop();
-            const bgColor = chartColors.backgroundColor.pop();
             return {
                 fill: fill,
                 label: column,
                 data: chartData.map((item: any) => item[column]),
-                backgroundColor: bgColor,
-                borderColor: borderColor,
+                backgroundColor: chartColors.backgroundColor[bgIdx++],
+                borderColor: chartColors.borderColor[boIdx++],
                 borderWidth: 2
             };
         }

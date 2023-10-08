@@ -7,8 +7,7 @@ import {
     ChartData
 } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-// import { getRandomNeonColor } from '../../utils/Helper';
-import { ChartColors } from '../../pages/addInsight/AddInsight';
+import { ChartColors } from '../../types/ChartColors';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

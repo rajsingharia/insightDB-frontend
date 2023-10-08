@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios"
+import { BASE_URL } from "./Constants";
 
 export default class AuthAxios{
     private static instance: AxiosInstance |null = null;
@@ -9,7 +10,7 @@ export default class AuthAxios{
         const token = localStorage.getItem('accessToken');
 
         return axios.create({
-            baseURL:'http://localhost:3000/api/v1',
+            baseURL: BASE_URL,
             headers: {
                 Authorization: `Bearer ${token}`
             }

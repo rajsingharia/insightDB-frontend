@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { CustomButton } from '../customMuiComponents/CustomButton'
 import AuthAxios from '../../utils/AuthAxios';
 import { ICharts } from '../../interfaces/ICharts';
-import { ChartColors, FetchDataResponse } from '../../pages/addInsight/AddInsight';
+import { FetchDataResponse } from '../../pages/addInsight/AddInsight';
 import { getRandomNeonColor } from '../../utils/Helper';
 import { Save } from 'lucide-react';
 import { QueryInput } from './QueryInput';
+import { ChartColors } from '../../types/ChartColors';
 
 
 
@@ -30,9 +31,10 @@ interface QueryFieldsProps {
     chartType: ICharts;
     setInsightParameters: React.Dispatch<React.SetStateAction<JSON>>;
     saveInsight: (event: unknown) => void;
+    changeRefreshRate: (refreshRate: number) => void;
 }
 
-export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsightData, setSelectedChartColors, chartType, setInsightParameters, saveInsight }) => {
+export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsightData, setSelectedChartColors, chartType, setInsightParameters, saveInsight, changeRefreshRate }) => {
 
     const [queryInfo, setQueryInfo] = useState<QueryInfoResponse>({} as QueryInfoResponse);
     const [refreshRate, setRefreshRate] = useState<number>(0);
@@ -44,13 +46,12 @@ export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsi
                 console.log("Query Info: ", res.data);
                 setQueryInfo(res.data);
                 setInsightData(undefined);
-                setInsightParameters({} as JSON);
             })
             .catch((err) => {
                 console.log(err)
             });
 
-    }, [chartType]);
+    }, [chartType, setInsightData]);
 
     const getInsightData = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -62,11 +63,7 @@ export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsi
 
         queryInfo.queryInfo.forEach((queryInfo) => {
 
-            let type = queryInfo.parameterType;
-            if (!(type == 'string' || type === 'number' || type == 'string[]')) {
-                type = JSON.parse(type);
-            }
-
+            const type = queryInfo.parameterType;
             const value = event.currentTarget[queryInfo.parameterName].value;
 
             if (value !== '') {
@@ -78,42 +75,39 @@ export const QueryFields: React.FC<QueryFieldsProps> = ({ integrationId, setInsi
             }
         });
 
-        parameters['refreshRate'] = refreshRate;
-
         const body = {
             integrationId: integrationId,
             parameters: parameters
         }
 
-        console.log("Body: ", body);
+        authAxios.post('/fetchData', body)
+            .then((res) => {
+                console.log("Data: ", res.data.data);
+                const fetchedData = res.data as FetchDataResponse;
 
-        const fetchInsightData = () => {
-            authAxios.post('/fetchData', body)
-                .then((res) => {
-                    console.log("Data: ", res.data.data);
-                    setInsightData(res.data);
-                    setInsightParameters(parameters);
-                    const fieldsCount = res.data.countOfFields;
-                    if (fieldsCount) {
-
-                        const borderColors = getRandomNeonColor(fieldsCount);
-                        const backgroundColors = borderColors.map((color) => color + '40');
-
-                        const chartColors: ChartColors = {
-                            backgroundColor: backgroundColors,
-                            borderColor: borderColors
-                        }
-
+                const fieldsCount = fetchedData.countOfFields;
+                if (fieldsCount) {
+                    const borderColors = getRandomNeonColor(Number(fieldsCount));
+                    let backgroundColors = borderColors;
+                    backgroundColors = backgroundColors.map((color) => color + '40');
+                    if (backgroundColors.length > 0 && borderColors.length > 0) {
+                        const chartColors = new ChartColors(
+                            backgroundColors,
+                            borderColors
+                        )
+                        console.log("Setting chart colors: ", chartColors);
                         setSelectedChartColors(chartColors);
-
                     }
-                })
-                .catch((err) => {
-                    console.log(err)
-                });
-        }
+                }
 
-        fetchInsightData();
+                setInsightData(fetchedData);
+                setInsightParameters(parameters);
+                changeRefreshRate(refreshRate);
+
+            })
+            .catch((err) => {
+                console.log(err)
+            });
 
         // TODO: This is a hacky way to refresh the data. Need to find a better way to do this.
         // TODO: Better way to do this is to use SSE (Server Sent Events) to push the data to the client.

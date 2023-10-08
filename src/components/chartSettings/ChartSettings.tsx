@@ -4,13 +4,11 @@ import { CustomTextField } from '../customMuiComponents/CustomTextField'
 import { CustomInputLabel } from '../customMuiComponents/CustomInputLabel'
 import { CustomSelect } from '../customMuiComponents/CustomSelect'
 import { CustomFormControl } from '../customMuiComponents/CustomFormControl'
-import { ChartColors, userIntegrationResponse } from '../../pages/addInsight/AddInsight'
-import { getRandomNeonColor } from '../../utils/Helper'
-
+import { userIntegrationResponse } from '../../pages/addInsight/AddInsight'
 
 interface ChartSettingsProps {
     selectedIntegration: userIntegrationResponse | undefined,
-    handelSelectedIntegrationChange: (event: any) => void,
+    handelSelectedIntegrationChange: (event: SelectChangeEvent<unknown>) => void,
     userIntegrations: userIntegrationResponse[],
     insightTitle: string,
     setInsightTitle: React.Dispatch<React.SetStateAction<string>>,

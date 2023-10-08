@@ -39,7 +39,7 @@ export const Home = () => {
       {
         loading &&
         <div className="flex flex-col justify-center items-center w-full h-full">
-          <h1 className="text-2xl font-bold">🔍 Gathering Insights for {user.firstName}...</h1>
+          <h1 className="text-2xl font-bold">🔍 Gathering Insights</h1>
           <CircularProgress
             size={40}
             className="mt-5"
@@ -61,7 +61,7 @@ export const Home = () => {
       |g3|g4|
       -------
 
-      g1, g2, g3, g4 -> 4 eqaual divs
+      g1, g2, g3, g4 -> 4 equal divs
       11,12 -> Grid 1 (could contain 1 or 2 cards within)
       21,22 -> Grid 2 (could contain 1 or 2 cards within)
       31,32 -> Grid 3 (could contain 1 or 2 cards within)

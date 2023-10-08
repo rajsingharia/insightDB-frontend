@@ -13,11 +13,12 @@ interface registerUser {
 }
 
 type RegisterProps = {
-  setLoginOrRegister: React.Dispatch<React.SetStateAction<LoginOrRegisterEnum>>
+  setLoginOrRegister: React.Dispatch<React.SetStateAction<LoginOrRegisterEnum>>;
+  setSnackBar: React.Dispatch<React.SetStateAction<{ open: boolean; message: string; }>>;
 }
 
 
-export const Register: React.FC<RegisterProps> = ({ setLoginOrRegister }) => {
+export const Register: React.FC<RegisterProps> = ({ setLoginOrRegister, setSnackBar }) => {
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -39,9 +40,11 @@ export const Register: React.FC<RegisterProps> = ({ setLoginOrRegister }) => {
       .then((response) => {
         console.log(response);
         setLoginOrRegister(LoginOrRegisterEnum.login)
+        setSnackBar({ open: true, message: 'User registered successfully' });
       })
       .catch((error) => {
         console.log(error);
+        setSnackBar({ open: true, message: error.message });
       });
 
   }

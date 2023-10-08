@@ -12,8 +12,7 @@ import {
 
 import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
-// import { getRandomNeonColor } from '../../utils/Helper';
-import { ChartColors } from '../../pages/addInsight/AddInsight';
+import { ChartColors } from '../../types/ChartColors';
 
 ChartJS.register(
     CategoryScale,
@@ -51,14 +50,16 @@ export const TimeBarGraph: React.FC<TimeBarGraphProps>= ({ chartData, chartDataC
 
     chartDataColumns = chartDataColumns.filter((column: string) => column !== chartDataTimeColumn);
 
+    let bgIdx = 0, boIdx = 0;
+    
     const datasets = chartDataColumns.map((column: string) => {
         if (column !== chartDataTimeColumn) {
             return {
                 fill: true,
                 label: column,
                 data: chartData.map((item: any) => item[column]),
-                backgroundColor: chartColors.backgroundColor.pop(),
-                borderColor: chartColors.borderColor.pop(),
+                backgroundColor: chartColors.backgroundColor[bgIdx++],
+                borderColor: chartColors.borderColor[boIdx++],
                 borderWidth: 2
             };
         }
